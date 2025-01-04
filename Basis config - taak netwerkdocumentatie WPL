@@ -1,0 +1,137 @@
+Basis config - taak netwerkdocumentatie WPL
+--------------------------------------------
+
+      <- Configuratie router  (R01) ->
+
+!<basis config>
+enable
+configure terminal
+hostname R1
+enable secret class
+line con 0
+password cisco
+login
+exit
+service password-encryption
+banner motd %
+***********************************
+Unauthorized access is prohibited!
+***********************************
+%
+
+!< config g0/0/0 >
+ipv6 unicast-routing
+interface g0/0/0
+description Link R1 to SW1
+ip address 192.168.0.1 255.255.255.0
+ipv6 address 2001:0db8:abcd:1234::1/64
+ipv6 address fe80::1 link-local
+no shut
+exit
+
+!< config g0/0/1 >
+interface g0/0/1
+description Link R1 to SW2
+ip address 192.168.1.1 255.255.255.0
+ipv6 address 2001:0db8:abcd:5678::1/64
+ipv6 address fe80::2 link-local
+no shut
+exit
+
+!< SSH toelaten >
+ip domain name pxl.com
+crypto key generate rsa general-keys modulus 1024
+username Lore secret pxl
+line vty 0 4
+exec-timeout 5 30
+login local
+transport input ssh
+exit
+
+!< opslaan >
+end
+copy running-config startup-config
+___________________________________________________________
+
+	
+
+		<- Configuratie Switch (SW1) ->
+
+!<basis config>
+enable
+configure terminal
+hostname SW1
+enable secret class
+service password-encryption
+banner motd %
+***********************************
+Unauthorized access is prohibited!
+***********************************
+%
+line con 0
+password cisco
+login
+
+!<ip config vlan1>
+interface vlan1
+description Link SW1 to R1
+ip address 192.168.0.2 255.255.255.0
+no shut
+exit
+ip default-gateway 192.168.0.1
+
+!<Instellen van SSH>
+ip domain name pxl.com
+crypto key generate rsa general-keys modulus 1024
+username Lore secret pxl
+line vty 0 15
+exec-timeout 5 30
+login local
+transport input ssh
+exit
+
+!<opslaan>
+end
+copy running-config startup-config
+___________________________________________________________
+
+      
+	
+	<- Configuratie Switch (SW2) ->
+
+!<basis config>
+enable
+configure terminal
+hostname SW2
+enable secret class
+service password-encryption
+banner motd %
+***********************************
+Unauthorized access is prohibited!
+***********************************
+%
+line con 0
+password cisco
+login
+
+!<ip config vlan1>
+interface vlan1
+description Link SW1 to R1
+ip address 192.168.1.2 255.255.255.0
+no shut
+exit
+ip default-gateway 192.168.1.1
+
+!<Instellen van SSH>
+ip domain name pxl.com
+crypto key generate rsa general-keys modulus 1024
+username Lore secret pxl
+line vty 0 15
+exec-timeout 5 30
+login local
+transport input ssh
+exit
+
+!<opslaan>
+end
+copy running-config startup-config
